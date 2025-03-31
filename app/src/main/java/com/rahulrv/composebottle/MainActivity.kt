@@ -38,22 +38,23 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        var usedAmount by remember {
-                            mutableIntStateOf(400)
-                        }
-
-                        val totalWaterAmount = remember { 2400 }
-
-                        WaterBottle(
-                            totalWaterAmount = totalWaterAmount,
-                            usedWaterAmount = usedAmount,
-                            unit = "ml"
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Text(text = "Total amount is: $totalWaterAmount")
-                        Button(onClick = { usedAmount += 200}) {
-                            Text(text = "Drink")
-                        }
+//                        var usedAmount by remember {
+//                            mutableIntStateOf(400)
+//                        }
+//
+//                        val totalWaterAmount = remember { 2400 }
+//
+//                        WaterBottle(
+//                            totalWaterAmount = totalWaterAmount,
+//                            usedWaterAmount = usedAmount,
+//                            unit = "ml"
+//                        )
+//                        Spacer(modifier = Modifier.height(20.dp))
+//                        Text(text = "Total amount is: $totalWaterAmount")
+//                        Button(onClick = { usedAmount += 200}) {
+//                            Text(text = "Drink")
+//                        }
+                        MedicationForm()
                     }
                 }
             }

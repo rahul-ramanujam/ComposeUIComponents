@@ -116,6 +116,7 @@ fun WaterBottle(
                     )
                     lineTo(
                         x = size.width,
+
                         y = size.height
                     )
                     lineTo(

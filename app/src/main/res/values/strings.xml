@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ComposeBottle</string>
+    <string name="add_medication">Add Medication</string>
+    <string name="medication_name">Medication name</string>
 </resources>
