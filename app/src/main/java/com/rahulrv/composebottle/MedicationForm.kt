@@ -2,6 +2,7 @@ package com.rahulrv.composebottle
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.rahulrv.composebottle.util.Recurrence
 
 /**
  * Created by  rahulramanujam On 3/30/25
@@ -29,6 +32,8 @@ import androidx.compose.ui.unit.dp
 fun MedicationForm() {
 
     var medicationName by rememberSaveable { mutableStateOf("") }
+    var numberOfDosage by rememberSaveable { mutableIntStateOf(1) }
+    var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
 
     Column(
         modifier = Modifier
@@ -58,6 +63,26 @@ fun MedicationForm() {
             },
             placeholder = { Text(text = "e.g Hexamine") }
         )
+
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        var isMaxDoseError by rememberSaveable { mutableStateOf(false) }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val maxDose = 3
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text(
+                    text = stringResource(R.string.dosage),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
 
     }
 }
