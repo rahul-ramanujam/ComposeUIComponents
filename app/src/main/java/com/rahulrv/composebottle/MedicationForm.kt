@@ -6,8 +6,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -22,6 +31,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rahulrv.composebottle.util.Recurrence
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.input.KeyboardType
+import com.rahulrv.composebottle.util.getRecurrenceList
+import kotlin.math.exp
 
 /**
  * Created by  rahulramanujam On 3/30/25
@@ -32,7 +46,7 @@ import com.rahulrv.composebottle.util.Recurrence
 fun MedicationForm() {
 
     var medicationName by rememberSaveable { mutableStateOf("") }
-    var numberOfDosage by rememberSaveable { mutableIntStateOf(1) }
+    var numberOfDosage: String by rememberSaveable { mutableStateOf("1") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
 
     Column(
@@ -81,8 +95,91 @@ fun MedicationForm() {
                     text = stringResource(R.string.dosage),
                     style = MaterialTheme.typography.bodyLarge
                 )
+
+                TextField(
+                    modifier = Modifier.width(128.dp),
+                    value = numberOfDosage.toString(),
+                    onValueChange = {
+                        if(it.length < maxDose) {
+                            isMaxDoseError = false
+                            numberOfDosage = it
+                        } else {
+                            isMaxDoseError = true
+                        }
+                    },
+                    trailingIcon = {
+                        if(isMaxDoseError) {
+                            Icon(
+                                imageVector = Icons.Filled.Info,
+                                contentDescription = "Error",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    },
+                    placeholder = { Text(text = "e.g. 1")},
+                    isError = isMaxDoseError,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
             }
+
+            RecurrenceDropDownMenu {recurrence = it}
         }
 
+        if(isMaxDoseError) {
+            Text(
+                text = "You cannot have more than 99 dosage per day",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall)
+        }
+
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecurrenceDropDownMenu(recurrence:(String) -> Unit) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy( 8.dp)
+    ) {
+
+        Text(
+            text = stringResource(R.string.recurrence),
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        val options = getRecurrenceList().map {it.name}
+        var expanded by remember {mutableStateOf(false)}
+        var selectionOptionText by remember { mutableStateOf(options[0]) }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {expanded = !expanded}
+        ) {
+
+            TextField(
+                modifier = Modifier.menuAnchor(),
+                readOnly = true,
+                value = selectionOptionText,
+                onValueChange = {},
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = true)},
+                colors = ExposedDropdownMenuDefaults.textFieldColors()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {expanded = false}
+            ) {
+                options.forEach {selectedOption ->
+                    DropdownMenuItem(
+                        text = {Text(text = selectedOption)},
+                        onClick = {
+                            selectionOptionText = selectedOption
+                            recurrence(selectedOption)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
