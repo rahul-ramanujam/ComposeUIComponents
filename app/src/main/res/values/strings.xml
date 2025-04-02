@@ -4,4 +4,5 @@
     <string name="medication_name">Medication name</string>
     <string name="dosage">Dosage</string>
     <string name="recurrence">Recurrence</string>
+    <string name="end_date">End Date</string>
 </resources>

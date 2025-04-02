@@ -1,9 +1,15 @@
 package com.rahulrv.composebottle
 
+import android.app.DatePickerDialog
+import android.icu.util.Calendar
+import android.widget.DatePicker
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -11,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,20 +29,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import com.rahulrv.composebottle.util.Recurrence
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.remember
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.rahulrv.composebottle.extensions.toformattedString
+import com.rahulrv.composebottle.util.Recurrence
 import com.rahulrv.composebottle.util.getRecurrenceList
-import kotlin.math.exp
+import java.text.DateFormatSymbols
+import java.util.Calendar.*
+import java.util.Date
 
 /**
  * Created by  rahulramanujam On 3/30/25
@@ -48,9 +58,11 @@ fun MedicationForm() {
     var medicationName by rememberSaveable { mutableStateOf("") }
     var numberOfDosage: String by rememberSaveable { mutableStateOf("1") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
+    var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
 
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .padding(16.dp, 16.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -132,6 +144,10 @@ fun MedicationForm() {
                 style = MaterialTheme.typography.bodySmall)
         }
 
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        EndDateTextField { endDate = it }
+
     }
 }
 
@@ -182,4 +198,52 @@ fun RecurrenceDropDownMenu(recurrence:(String) -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun EndDateTextField(endDate: (Long) -> Unit) {
+
+    Text(
+        text = stringResource(R.string.end_date),
+        style = MaterialTheme.typography.bodyLarge
+    )
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed: Boolean by interactionSource.collectIsPressedAsState()
+
+    val currentDate = Date().toformattedString()
+    var selectedDate by rememberSaveable { mutableStateOf(currentDate) }
+
+    val context = LocalContext.current
+
+    val calendar = Calendar.getInstance()
+    val year: Int = calendar.get(YEAR)
+    val month: Int = calendar.get(MONTH)
+    val day: Int = calendar.get(Calendar.DAY_OF_MONTH)
+    calendar.time = Date()
+
+    val datePickerDialog =
+        DatePickerDialog(context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+            val newDate = Calendar.getInstance()
+            newDate.set(year, month, dayOfMonth)
+            selectedDate = "${month.toMonthName()} $dayOfMonth $year"
+            endDate(newDate.timeInMillis)
+        }, year, month, day)
+
+    TextField(
+        modifier = Modifier.fillMaxWidth(),
+        readOnly = true,
+        value = selectedDate,
+        onValueChange = {},
+        trailingIcon = {Icons.Default.DateRange},
+        interactionSource = interactionSource
+    )
+
+    if(isPressed) {
+        datePickerDialog.show()
+    }
+}
+
+fun Int.toMonthName(): String {
+    return DateFormatSymbols().months[this]
 }
