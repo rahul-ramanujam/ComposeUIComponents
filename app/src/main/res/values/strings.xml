@@ -5,4 +5,5 @@
     <string name="dosage">Dosage</string>
     <string name="recurrence">Recurrence</string>
     <string name="end_date">End Date</string>
+    <string name="time_of_day">Time of day</string>
 </resources>

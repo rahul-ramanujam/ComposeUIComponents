@@ -1,8 +1,10 @@
 package com.rahulrv.composebottle
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.icu.util.Calendar
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -18,17 +20,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.rahulrv.composebottle.extensions.toformattedString
 import com.rahulrv.composebottle.util.Recurrence
+import com.rahulrv.composebottle.util.TimesOfDay
 import com.rahulrv.composebottle.util.getRecurrenceList
 import java.text.DateFormatSymbols
 import java.util.Calendar.*
@@ -59,6 +65,11 @@ fun MedicationForm() {
     var numberOfDosage: String by rememberSaveable { mutableStateOf("1") }
     var recurrence by rememberSaveable { mutableStateOf(Recurrence.Daily.name) }
     var endDate by rememberSaveable { mutableLongStateOf(Date().time) }
+
+    var isMorningSelected by rememberSaveable { mutableStateOf(false) }
+    var isAfternoonSelected by rememberSaveable { mutableStateOf(false) }
+    var isEveningSelected by rememberSaveable { mutableStateOf(false) }
+    var isNightSelected by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -148,7 +159,179 @@ fun MedicationForm() {
 
         EndDateTextField { endDate = it }
 
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        Text(
+            text = stringResource(R.string.time_of_day),
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        var selectionCount by rememberSaveable { mutableIntStateOf(0) }
+        val context = LocalContext.current
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+            FilterChip(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                selected = isMorningSelected,
+                onClick = {
+                    handleSelection(
+                        isSelected = isMorningSelected,
+                        selectionCount = selectionCount,
+                        canSelectMoreTimesOfDay = canSelectedMoreTimesOfday(
+                            selectionCount,
+                            numberOfDosage.toIntOrNull() ?: 0
+                        ),
+                        onStateChange = { count, selected ->
+                            isMorningSelected = selected
+                            selectionCount = count
+                        },
+                        onShowMaxSelectionError = {
+                                showMaxSeletionToast(numberOfDosage, context)
+                        }
+                    )
+                },
+                label = { Text(text = TimesOfDay.Morning.name) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "Selected"
+                    )
+                }
+            )
+
+
+            FilterChip(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                selected = isAfternoonSelected,
+                onClick = {
+                    handleSelection(
+                        isSelected = isAfternoonSelected,
+                        selectionCount = selectionCount,
+                        canSelectMoreTimesOfDay = canSelectedMoreTimesOfday(
+                            selectionCount,
+                            numberOfDosage.toIntOrNull() ?: 0
+                        ),
+                        onStateChange = { count, selected ->
+                            isAfternoonSelected = selected
+                            selectionCount = count
+                        },
+                        onShowMaxSelectionError = {
+                            showMaxSeletionToast(numberOfDosage, context)
+                        }
+                    )
+                },
+                label = { Text(text = TimesOfDay.Afternoon.name) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "Selected"
+                    )
+                }
+            )
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+            FilterChip(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                selected = isEveningSelected,
+                onClick = {
+                    handleSelection(
+                        isSelected = isEveningSelected,
+                        selectionCount = selectionCount,
+                        canSelectMoreTimesOfDay = canSelectedMoreTimesOfday(
+                            selectionCount,
+                            numberOfDosage.toIntOrNull() ?: 0
+                        ),
+                        onStateChange = { count, selected ->
+                            isEveningSelected = selected
+                            selectionCount = count
+                        },
+                        onShowMaxSelectionError = {
+                            showMaxSeletionToast(numberOfDosage, context)
+                        }
+                    )
+                },
+                label = { Text(text = TimesOfDay.Evening.name) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "Selected"
+                    )
+                }
+            )
+
+
+            FilterChip(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                selected = isNightSelected,
+                onClick = {
+                    handleSelection(
+                        isSelected = isNightSelected,
+                        selectionCount = selectionCount,
+                        canSelectMoreTimesOfDay = canSelectedMoreTimesOfday(
+                            selectionCount,
+                            numberOfDosage.toIntOrNull() ?: 0
+                        ),
+                        onStateChange = { count, selected ->
+                            isNightSelected = selected
+                            selectionCount = count
+                        },
+                        onShowMaxSelectionError = {
+                            showMaxSeletionToast(numberOfDosage, context)
+                        }
+                    )
+                },
+                label = { Text(text = TimesOfDay.Night.name) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "Selected"
+                    )
+                }
+            )
+        }
+
     }
+}
+
+private fun handleSelection(
+    isSelected: Boolean,
+    selectionCount: Int,
+    canSelectMoreTimesOfDay: Boolean,
+    onStateChange: (Int, Boolean) -> Unit,
+    onShowMaxSelectionError: () -> Unit
+) {
+    if (isSelected) {
+        onStateChange(selectionCount - 1, !isSelected)
+    } else {
+        if (canSelectMoreTimesOfDay) {
+            onStateChange(selectionCount + 1, !isSelected)
+        } else {
+            onShowMaxSelectionError()
+        }
+    }
+}
+
+private fun canSelectedMoreTimesOfday(selectionCount: Int, numberOfDosage: Int): Boolean {
+    return selectionCount < numberOfDosage
+}
+
+private fun showMaxSeletionToast(numberOfDosage: String, context: Context) {
+    Toast.makeText(
+        context,
+        "You're selecting ${(numberOfDosage.toIntOrNull() ?: 0) + 1} times(s) of days which is more than the number of dosage.",
+        Toast.LENGTH_LONG
+    ).show()
 }
 
 
