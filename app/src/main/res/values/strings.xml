@@ -6,4 +6,5 @@
     <string name="recurrence">Recurrence</string>
     <string name="end_date">End Date</string>
     <string name="time_of_day">Time of day</string>
+    <string name="save">Save</string>
 </resources>
