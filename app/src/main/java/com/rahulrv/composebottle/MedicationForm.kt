@@ -312,7 +312,30 @@ fun MedicationForm() {
                 .height(56.dp)
                 .align(Alignment.CenterHorizontally),
             onClick = {
-                // TODO: validate all input values
+                validateMedication(
+                    name = medicationName,
+                    dosage = numberOfDosage.toIntOrNull() ?: 0,
+                    recurrence = recurrence,
+                    endDate = endDate,
+                    morningSeletion = isMorningSelected,
+                    eveningSelected = isEveningSelected,
+                    afternoonSelected = isAfternoonSelected,
+                    nightSelected = isNightSelected,
+                    onInvalidate = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.value_is_empty, context.getString(it)),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    },
+                    onValidate = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.success),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
             }
         ) {
             Text(
@@ -322,6 +345,42 @@ fun MedicationForm() {
         }
 
     }
+}
+
+private fun validateMedication(
+    name: String,
+    dosage: Int,
+    recurrence: String,
+    endDate: Long,
+    morningSeletion: Boolean,
+    afternoonSelected: Boolean,
+    eveningSelected: Boolean,
+    nightSelected: Boolean,
+    onInvalidate: (Int) -> Unit,
+    onValidate: () -> Unit
+) {
+    if (name.isEmpty()) {
+        onInvalidate(R.string.medication_name)
+        return
+    }
+
+    if (dosage < 1) {
+        onInvalidate(R.string.end_date)
+        return
+    }
+
+    if (!morningSeletion && !afternoonSelected && !eveningSelected && !nightSelected) {
+        onInvalidate(R.string.time_of_day)
+        return
+    }
+
+    val timesOfDay = mutableListOf<TimesOfDay>()
+    if (morningSeletion) timesOfDay.add(TimesOfDay.Morning)
+    if (afternoonSelected) timesOfDay.add(TimesOfDay.Afternoon)
+    if (eveningSelected) timesOfDay.add(TimesOfDay.Evening)
+    if (nightSelected) timesOfDay.add(TimesOfDay.Night)
+
+    onValidate()
 }
 
 private fun handleSelection(

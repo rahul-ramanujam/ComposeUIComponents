@@ -7,4 +7,6 @@
     <string name="end_date">End Date</string>
     <string name="time_of_day">Time of day</string>
     <string name="save">Save</string>
+    <string name="success">Medication Successfully Saved</string>
+    <string name="value_is_empty">Please enter a valid %s\n\t\t\t\t</string>
 </resources>
